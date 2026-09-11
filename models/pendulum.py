@@ -24,7 +24,7 @@ def generate_params():
         "gravity": 9.81,  # gravity m/s^2)
         "length": 1,  # rod length (m)
         "mass": 1,  # point mass at end of rod (kg)
-        "damping_coeff": 0,  # damping coefficient (kg*m^2/s)
+        "damping_coeff": 0.1,  # damping coefficient (kg*m^2/s)
     }
     return params
 
