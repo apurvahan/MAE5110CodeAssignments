@@ -59,9 +59,6 @@ def build_roa_lookup(params, theta_range=(-0.2, 0.2), thetadot_range=(-0.6, 0.6)
  
  
 def reached_stabilizing_roa(state, roa_lookup):
-    """Event guard: True once `state` has entered the ankle controller's RoA
-    (nearest-neighbor lookup against the precomputed grid). Outside the grid's
-    range entirely is treated as NOT in the RoA."""
     theta, thetadot = state
     thetas, thetadots, labels = roa_lookup["thetas"], roa_lookup["thetadots"], roa_lookup["labels"]
     if not (thetas[0] <= theta <= thetas[-1] and thetadots[0] <= thetadot <= thetadots[-1]):

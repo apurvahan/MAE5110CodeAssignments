@@ -5,10 +5,6 @@ from integrators import rk4 as integrator
 
 
 def integrate_until_any_guard(state0, guards, params, dt=0.001, t_max=5.0, bisect_tol=1e-10):
-    """March with RK4 until any guard_fn(prev_state, next_state, params) in
-    `guards` returns True, then bisect within that one step to refine the
-    crossing. Returns (which_guard_index, t_event, state_event), or
-    (None, None, final_state) on timeout."""
     state = np.array(state0, dtype=float)
     t = 0.0
     while t < t_max:
@@ -30,23 +26,16 @@ def integrate_until_any_guard(state0, guards, params, dt=0.001, t_max=5.0, bisec
 
 
 def poincare_step(thetadot_k, alpha, params, dt=0.001, t_max=5.0):
-    """One iteration of the theta=0 Poincare return map: swing from theta=0
-    to touchdown (phase 1, always succeeds), reset, then climb back through
-    theta=0 (phase 2, CAN fail if there isn't enough post-reset velocity to
-    clear vertical again).
-
-    Returns thetadot_{k+1} (float) on success, or None if the walker falls
-    during phase 2 or times out."""
     p = dict(params)
     p["angle_of_attack"] = alpha
-    p["ankle_torque"] = 0.0  # controller is off during ordinary footsteps
+    p["ankle_torque"] = 0.0  
 
-    # phase 1: theta=0 -> touchdown (guaranteed, since thetaddot>0 throughout for thetadot_k>0)
+    
     which, _, x_impact = integrate_until_any_guard(
         [0.0, thetadot_k], [model.event_guard], p, dt=dt, t_max=t_max
     )
     if which is None:
-        return None  # shouldn't happen for thetadot_k > 0, but guard against pathological inputs
+        return None  
 
     x_reset = model.event_dynamics(x_impact, p)
     theta_start = x_reset[0]
@@ -61,5 +50,5 @@ def poincare_step(thetadot_k, alpha, params, dt=0.001, t_max=5.0):
         x_reset, [success_guard, fail_guard], p, dt=dt, t_max=t_max
     )
     if which == 0:
-        return x_event[1]  # thetadot_{k+1}
-    return None  # fell during the climb back through vertical, or timed out
+        return x_event[1]  
+    return None  # 
